@@ -31,8 +31,6 @@ public class WeiXinPortalController {
 
     /**
      * 处理微信服务器发来的get请求，进行签名的验证
-     * http://xfg-studio.natapp1.cc/wx/portal/wx4bd388e42758df34
-     * <p>
      * appid     微信端AppID
      * signature 微信端发来的签名
      * timestamp 微信端发来的时间戳
