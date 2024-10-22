@@ -3,15 +3,19 @@ package com.gaoyifeng.IDaaS.domain.auth.model;
 
 import lombok.Data;
 
-@Data
-public class IUser {
+import java.util.Date;
 
-    private Long id;
+@Data
+public class UserAccountEntity {
+
+    private String flakeSnowId;
     private String wxOpenId;
     private String wxUserName;
     private String nickName;
     private String icon;
     private String phone;
     private String email;
+    private Date createTime;
+    private Date updateTime;
 
 }
