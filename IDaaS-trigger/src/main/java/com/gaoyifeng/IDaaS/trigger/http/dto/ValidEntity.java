@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 public class ValidEntity {
 
+    private String flakeSnowId;
     private String account;
     private String code;
     private String type;

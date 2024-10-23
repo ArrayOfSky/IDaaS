@@ -11,13 +11,13 @@ spring:
         server-addr: xxx.xxx.xxx.xxx:8848
   mvc:
     servlet:
-      path: /IDaaS
+      path: /api/IDaaS/v1
 
   # mysql
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    password: xxx
-    url: jdbc:mysql://xxx.xxx.xxx.xxx:3306/IDaaS?serverTimezone=Asia/Shanghai&characterEncoding=UTF-8&useSSL=false
+    password: gaoyifeng
+    url: jdbc:mysql://xxx.xxx.xxx.xxx:3306/IDaaS?serverTimezone=Asia/Shanghai&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true
     username: root
     type: com.zaxxer.hikari.HikariDataSource
   hikari:
@@ -30,20 +30,32 @@ spring:
     connection-timeout: 30000 #数据库连接超时时间,默认30秒，即30000
     connection-test-query: SELECT 1
 
-  data:
-    #   redis
-    redis:
+redis:
+  sdk:
+    config:
       host: xxx.xxx.xxx.xxx
+      password: gaoyifeng
       port: 6379
-      password: xxx
-      database: 0
-      timeout: 1000
-      lettuce:
-        pool:
-          max-active: 8
-          max-wait: -1
-          max-idle: 8
-          min-idle: 0
+      pool-size: 10
+      min-idle-size: 5
+      idle-timeout: 30000
+      connect-timeout: 5000
+      retry-attempts: 3
+      retry-interval: 1000
+      ping-interval: 60000
+      keep-alive: true
+
+  mail:
+    host: smtp.qq.com
+    username: xxxxxx@qq.com
+    password: xxxxx
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
 
 # 微信公众号配置信息
 # originalid：原始ID
@@ -51,9 +63,9 @@ spring:
 # token：开通接口服务自定义设置
 wx:
   config:
-    originalid: xxx
-    appid: xxx
-    token: xxx
+    originalid: xxxxx
+    appid: xxxxxx
+    token: xxxxx
 
 mybatis:
   mapper-locations: classpath:/mybatis/mapper/*.xml

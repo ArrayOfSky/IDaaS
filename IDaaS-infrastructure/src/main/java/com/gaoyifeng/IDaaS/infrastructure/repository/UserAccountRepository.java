@@ -5,6 +5,8 @@ import com.gaoyifeng.IDaaS.domain.auth.repository.IUserAccountRepository;
 public class UserAccountRepository implements IUserAccountRepository {
 
 
+    @Override
+    public void putCacheCode(String account, String type, String code) {
 
-
+    }
 }

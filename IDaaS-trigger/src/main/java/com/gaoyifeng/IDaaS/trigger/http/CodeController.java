@@ -22,21 +22,44 @@ public class CodeController {
 
     @PostMapping("/getCode")
     public Response<String> getCode(@RequestBody CodeEntity codeEntity){
-        String account = codeEntity.getAccount();
-        String type = codeEntity.getType();
-        codeService.getCode(account,type);
-        return Response.<String>builder()
-                .code(Constants.ResponseCode.SUCCESS.getCode())
-                .info(Constants.ResponseCode.SUCCESS.getInfo())
-                .data("")
-                .build();
+        try{
+            String account = codeEntity.getAccount();
+            String type = codeEntity.getType();
+            codeService.getCode(account,type);
+            return Response.<String>builder()
+                    .code(Constants.ResponseCode.SUCCESS.getCode())
+                    .info(Constants.ResponseCode.SUCCESS.getInfo())
+                    .data("")
+                    .build();
+        }catch (Exception e){
+            return Response.<String>builder()
+                    .code(Constants.ResponseCode.UN_ERROR.getCode())
+                    .info("生成验证码失败")
+                    .data("")
+                    .build();
+        }
     }
 
     @PostMapping("/validCode")
-    public void validCode(@RequestBody ValidEntity validEntity){
-        validEntity.getAccount();
-        validEntity.getCode();
-        validEntity.getType();
+    public Response<String> validCode(@RequestBody ValidEntity validEntity){
+        try {
+            String flakeSnowId = validEntity.getFlakeSnowId();
+            String account = validEntity.getAccount();
+            String code = validEntity.getCode();
+            String type = validEntity.getType();
+            codeService.validCode(flakeSnowId,account,code,type);
+            return Response.<String>builder()
+                    .code(Constants.ResponseCode.SUCCESS.getCode())
+                    .info(Constants.ResponseCode.SUCCESS.getInfo())
+                    .data("")
+                    .build();
+        } catch (Exception e) {
+            return Response.<String>builder()
+                    .code(Constants.ResponseCode.UN_ERROR.getCode())
+                    .info("验证失败")
+                    .data("")
+                    .build();
+        }
     }
 
 }
