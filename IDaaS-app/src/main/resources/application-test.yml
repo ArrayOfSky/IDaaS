@@ -1,8 +1,9 @@
 server:
-  port: 8080
+  port: 10010
 spring:
   application:
     name: IDaaS
+
   cloud:
     nacos:
       config:
@@ -13,10 +14,22 @@ spring:
     servlet:
       path: /api/IDaaS/v1
 
+  mail:
+    host: smtp.qq.com
+    username: xxxxxx@qq.com
+    password: xxxxxx
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
   # mysql
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    password: gaoyifeng
+    password: xxxxxxx
     url: jdbc:mysql://xxx.xxx.xxx.xxx:3306/IDaaS?serverTimezone=Asia/Shanghai&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true
     username: root
     type: com.zaxxer.hikari.HikariDataSource
@@ -34,7 +47,7 @@ redis:
   sdk:
     config:
       host: xxx.xxx.xxx.xxx
-      password: gaoyifeng
+      password: xxxxxxx
       port: 6379
       pool-size: 10
       min-idle-size: 5
@@ -45,25 +58,13 @@ redis:
       ping-interval: 60000
       keep-alive: true
 
-  mail:
-    host: smtp.qq.com
-    username: xxxxxx@qq.com
-    password: xxxxx
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
-
 # 微信公众号配置信息
 # originalid：原始ID
 # appid：个人AppID
 # token：开通接口服务自定义设置
 wx:
   config:
-    originalid: xxxxx
+    originalid: xxxxxx
     appid: xxxxxx
     token: xxxxx
 

@@ -6,8 +6,10 @@ import com.gaoyifeng.IDaaS.domain.auth.service.code.CodeService;
 import com.gaoyifeng.IDaaS.trigger.http.dto.CodeEntity;
 import com.gaoyifeng.IDaaS.trigger.http.dto.ValidEntity;
 import com.gaoyifeng.IDaaS.types.commom.Constants;
+import com.gaoyifeng.IDaaS.types.exception.BaseException;
 import com.gaoyifeng.IDaaS.types.model.Response;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/code")
+@Slf4j
 public class CodeController {
 
     @Resource
@@ -23,6 +26,7 @@ public class CodeController {
     @PostMapping("/getCode")
     public Response<String> getCode(@RequestBody CodeEntity codeEntity){
         try{
+            log.info("准备发送验证码");
             String account = codeEntity.getAccount();
             String type = codeEntity.getType();
             codeService.getCode(account,type);
@@ -31,11 +35,21 @@ public class CodeController {
                     .info(Constants.ResponseCode.SUCCESS.getInfo())
                     .data("")
                     .build();
+        }catch (BaseException e){
+            log.error("生成验证码失败",e);
+            return Response.<String>builder()
+                    .code(e.getCode())
+                    .info(e.getMessage())
+                    .data(e.getContent())
+                    .build();
         }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("11111111111111111");
+            log.error("生成验证码失败",e);
             return Response.<String>builder()
                     .code(Constants.ResponseCode.UN_ERROR.getCode())
                     .info("生成验证码失败")
-                    .data("")
+                    .data("发送验证码失败")
                     .build();
         }
     }

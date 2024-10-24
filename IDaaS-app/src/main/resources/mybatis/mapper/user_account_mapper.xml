@@ -2,5 +2,30 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gaoyifeng.IDaaS.infrastructure.dao.IUserAccountDao">
 
+    <resultMap id="UserAccount" type="com.gaoyifeng.IDaaS.infrastructure.po.UserAccountPo">
+        <id property="id" column="id"/>
+        <result property="flakeSnowId" column="flake_snow_id"/>
+        <result property="wxOpenId" column="wx_open_id"/>
+        <result property="wxUserName" column="wx_user_name"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="icon" column="icon"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+
+    <select id="selectUserByEmail" resultMap="UserAccount">
+        SELECT * FROM user_account WHERE email = #{account}
+    </select>
+
+
+
+    <select id="selectUserByPhone" resultMap="UserAccount">
+        SELECT * FROM user_account WHERE phone = #{account}
+    </select>
+
+
 
 </mapper>

@@ -8,7 +8,6 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.io.File;
 
@@ -20,9 +19,6 @@ public class QQEmailUtil {
 
     @Autowired
     private JavaMailSender mailSender;
-
-    @Autowired
-    private FreeMarkerConfigurer markerConfigurer;
 
     public void sendStringEmail(String receiverName, String title, String content) {
         SimpleMailMessage message = new SimpleMailMessage();
