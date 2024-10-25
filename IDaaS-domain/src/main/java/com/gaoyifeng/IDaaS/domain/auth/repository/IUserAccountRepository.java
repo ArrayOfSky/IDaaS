@@ -1,8 +1,10 @@
 package com.gaoyifeng.IDaaS.domain.auth.repository;
 
-import com.gaoyifeng.IDaaS.domain.auth.model.UserAccountEntity;
+import com.gaoyifeng.IDaaS.domain.auth.model.entity.UserAccountEntity;
 
 public interface IUserAccountRepository {
+
+    void getCode(String account, String type,String code);
 
     void putCacheCode(String account, String type, String code);
 

@@ -1,0 +1,4 @@
+## 文件名信息
+#org.springframework.boot.autoconfigure.AutoConfiguration.imports
+## 文件内容
+#org.apache.rocketmq.spring.autoconfigure.RocketMQAutoConfiguration

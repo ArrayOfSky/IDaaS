@@ -1,4 +1,4 @@
-package com.gaoyifeng.IDaaS.domain.auth.model;
+package com.gaoyifeng.IDaaS.domain.auth.model.entity;
 
 
 import lombok.Data;

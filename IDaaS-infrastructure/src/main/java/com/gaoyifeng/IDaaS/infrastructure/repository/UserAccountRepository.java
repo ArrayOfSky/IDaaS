@@ -1,14 +1,20 @@
 package com.gaoyifeng.IDaaS.infrastructure.repository;
 
-import com.gaoyifeng.IDaaS.domain.auth.model.UserAccountEntity;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.nacos.shaded.com.google.gson.JsonObject;
+import com.gaoyifeng.IDaaS.domain.auth.model.entity.CodeSendEntity;
+import com.gaoyifeng.IDaaS.domain.auth.model.entity.UserAccountEntity;
 import com.gaoyifeng.IDaaS.domain.auth.model.valobj.CodeTypeVo;
 import com.gaoyifeng.IDaaS.domain.auth.repository.IUserAccountRepository;
 import com.gaoyifeng.IDaaS.infrastructure.dao.IUserAccountDao;
 import com.gaoyifeng.IDaaS.infrastructure.po.UserAccountPo;
 import com.gaoyifeng.IDaaS.infrastructure.redis.IRedisService;
 import com.gaoyifeng.IDaaS.types.commom.Constants;
+import com.gaoyifeng.IDaaS.types.enums.RabbitMqModel;
 import com.gaoyifeng.IDaaS.types.exception.BaseException;
 import jakarta.annotation.Resource;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -21,6 +27,8 @@ public class UserAccountRepository implements IUserAccountRepository {
     @Resource
     IUserAccountDao userAccountDao;
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
     @Resource
     private IRedisService redissonService;
 
@@ -34,6 +42,15 @@ public class UserAccountRepository implements IUserAccountRepository {
         cacheMap.put(CodeTypeVo.BOUND_PHONE,CACHE_BOUND_PHONE);
     }
 
+
+    @Override
+    public void getCode(String account, String type,String code) {
+        CodeSendEntity codeSendEntity = new CodeSendEntity();
+        codeSendEntity.setAccount(account);
+        codeSendEntity.setCode(code);
+        codeSendEntity.setType(type);
+        rabbitTemplate.convertAndSend(RabbitMqModel.EMAIL_QUEUE,RabbitMqModel.EMAIL_KEY+"message", JSON.toJSONString(codeSendEntity));
+    }
 
     @Override
     public void putCacheCode(String account, String type, String code) {

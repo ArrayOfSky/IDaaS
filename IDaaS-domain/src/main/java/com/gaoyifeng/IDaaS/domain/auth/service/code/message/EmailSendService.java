@@ -3,6 +3,8 @@ package com.gaoyifeng.IDaaS.domain.auth.service.code.message;
 import com.gaoyifeng.IDaaS.domain.auth.service.code.ISendMessageService;
 import com.gaoyifeng.IDaaS.types.sdk.QQEmailUtil;
 import jakarta.annotation.Resource;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,6 +20,10 @@ public class EmailSendService implements ISendMessageService {
 
     @Override
     public void sendMessage(String to, String content) {
-        qqEmailUtil.sendStringEmail(to,title,content);
+        qqEmailUtil.sendStringEmail(to, title, content);
     }
+
+
+
+
 }

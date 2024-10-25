@@ -43,6 +43,13 @@ spring:
     connection-timeout: 30000 #数据库连接超时时间,默认30秒，即30000
     connection-test-query: SELECT 1
 
+    #  rabbitMq
+  rabbitmq:
+    host: xxx.xxx.xxx.xxx
+    port: 5672
+    username: xxxxxxx
+    password: xxxxxxx
+
 redis:
   sdk:
     config:

@@ -1,6 +1,6 @@
 package com.gaoyifeng.IDaaS.domain.auth.service.code.filter;
 
-import com.gaoyifeng.IDaaS.domain.auth.model.UserAccountEntity;
+import com.gaoyifeng.IDaaS.domain.auth.model.entity.UserAccountEntity;
 import com.gaoyifeng.IDaaS.domain.auth.repository.IUserAccountRepository;
 import com.gaoyifeng.IDaaS.domain.auth.service.code.ISendFilterService;
 import com.gaoyifeng.IDaaS.types.commom.Constants;
