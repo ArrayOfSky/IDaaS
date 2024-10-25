@@ -44,7 +44,6 @@ public class CodeController {
                     .build();
         }catch (Exception e){
             e.printStackTrace();
-            System.out.println("11111111111111111");
             log.error("生成验证码失败",e);
             return Response.<String>builder()
                     .code(Constants.ResponseCode.UN_ERROR.getCode())
@@ -54,6 +53,9 @@ public class CodeController {
         }
     }
 
+    /**
+     * 仅用于绑定等途径
+     */
     @PostMapping("/validCode")
     public Response<String> validCode(@RequestBody ValidEntity validEntity){
         try {
@@ -67,11 +69,20 @@ public class CodeController {
                     .info(Constants.ResponseCode.SUCCESS.getInfo())
                     .data("")
                     .build();
-        } catch (Exception e) {
+        }catch (BaseException e){
+            log.error("验证验证码",e);
+            return Response.<String>builder()
+                    .code(e.getCode())
+                    .info(e.getMessage())
+                    .data(e.getContent())
+                    .build();
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error("验证验证码",e);
             return Response.<String>builder()
                     .code(Constants.ResponseCode.UN_ERROR.getCode())
-                    .info("验证失败")
-                    .data("")
+                    .info("验证验证码")
+                    .data("验证验证码")
                     .build();
         }
     }

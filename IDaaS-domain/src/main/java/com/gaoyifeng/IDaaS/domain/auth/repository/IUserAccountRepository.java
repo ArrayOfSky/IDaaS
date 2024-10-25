@@ -11,4 +11,6 @@ public interface IUserAccountRepository {
     UserAccountEntity selectUserByEmail(String account);
 
     UserAccountEntity selectUserByPhone(String account);
+
+    String getCacheCode(String account, String type);
 }

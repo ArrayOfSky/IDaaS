@@ -74,6 +74,16 @@ public class UserAccountRepository implements IUserAccountRepository {
         return  getUserAccountEntityByPo(userAccountPo);
     }
 
+    @Override
+    public String getCacheCode(String account, String type) {
+        CodeTypeVo codeType = CodeTypeVo.getCodeType(type);
+        String key = cacheMap.get(codeType);
+        if(StringUtils.isEmpty(key)){
+            throw new BaseException(Constants.ResponseCode.ILLEGAL_PARAMETER,"Invalid type: " + type);
+        }
+        return redissonService.getValue(key + account);
+    }
+
     private UserAccountEntity getUserAccountEntityByPo(UserAccountPo userAccountPo){
         UserAccountEntity userAccount = null;
         if(userAccountPo!=null){

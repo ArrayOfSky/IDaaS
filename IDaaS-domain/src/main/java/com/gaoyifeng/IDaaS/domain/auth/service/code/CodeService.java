@@ -4,18 +4,17 @@ import com.gaoyifeng.IDaaS.domain.auth.model.entity.CodeSendEntity;
 import com.gaoyifeng.IDaaS.domain.auth.model.valobj.CodeTypeVo;
 import com.gaoyifeng.IDaaS.domain.auth.repository.IUserAccountRepository;
 import com.gaoyifeng.IDaaS.domain.auth.service.ICodeService;
+import com.gaoyifeng.IDaaS.domain.auth.service.code.bound.EmailBoundService;
+import com.gaoyifeng.IDaaS.domain.auth.service.code.bound.PhoneBoundService;
 import com.gaoyifeng.IDaaS.domain.auth.service.code.filter.EmailFilterService;
 import com.gaoyifeng.IDaaS.domain.auth.service.code.filter.PhoneFilterService;
-import com.gaoyifeng.IDaaS.domain.auth.service.code.message.EmailSendService;
-import com.gaoyifeng.IDaaS.domain.auth.service.code.message.MessageSendService;
+import com.gaoyifeng.IDaaS.domain.auth.service.code.send.EmailSendService;
+import com.gaoyifeng.IDaaS.domain.auth.service.code.send.MessageSendService;
 import com.gaoyifeng.IDaaS.types.commom.Constants;
-import com.gaoyifeng.IDaaS.types.enums.RabbitMqModel;
 import com.gaoyifeng.IDaaS.types.exception.BaseException;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -32,13 +31,21 @@ public class CodeService implements ICodeService {
 
     private Map<CodeTypeVo, ISendFilterService> codeFilterMap = new HashMap<>(2);
 
-    public CodeService(EmailSendService emailSendService, MessageSendService messageSendService, EmailFilterService emailFilterService, PhoneFilterService phoneFilterService) {
+    private Map<CodeTypeVo, IVerifyMessageService> codeVerifyMap = new HashMap<>(2);
+
+    public CodeService(EmailSendService emailSendService, MessageSendService messageSendService,
+                       EmailFilterService emailFilterService, PhoneFilterService phoneFilterService,
+                       EmailBoundService emailBoundService,
+                       PhoneBoundService phoneBoundService) {
 
         codeSendMap.put(CodeTypeVo.BOUND_EMAIL, emailSendService);
         codeSendMap.put(CodeTypeVo.BOUND_PHONE, messageSendService);
 
         codeFilterMap.put(CodeTypeVo.BOUND_EMAIL, emailFilterService);
         codeFilterMap.put(CodeTypeVo.BOUND_PHONE, phoneFilterService);
+
+        codeVerifyMap.put(CodeTypeVo.BOUND_EMAIL, emailBoundService);
+        codeVerifyMap.put(CodeTypeVo.BOUND_PHONE, phoneBoundService);
     }
 
     @Override
@@ -70,10 +77,15 @@ public class CodeService implements ICodeService {
     @Override
     public void validCode(String flakeSnowId, String account, String code, String type) {
         //根据类型和账号从缓存中获取验证码
-
+        log.info("根据类型和账号从缓存中获取验证码");
+        String cacheCode = userAccountRepository.getCacheCode(account, type);
         //校验验证码
-
+        log.info("校验验证码");
+        if (!code.equals(cacheCode)) {
+            throw new BaseException(Constants.ResponseCode.ILLEGAL_PARAMETER, "验证码错误");
+        }
         //校验成功，执行绑定操作
-
+        log.info("校验成功，执行绑定操作");
+        codeVerifyMap.get(CodeTypeVo.getCodeType(type)).verifyMessage(flakeSnowId, account);
     }
 }

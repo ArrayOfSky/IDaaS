@@ -1,10 +1,8 @@
-package com.gaoyifeng.IDaaS.domain.auth.service.code.message;
+package com.gaoyifeng.IDaaS.domain.auth.service.code.send;
 
 import com.gaoyifeng.IDaaS.domain.auth.service.code.ISendMessageService;
 import com.gaoyifeng.IDaaS.types.sdk.QQEmailUtil;
 import jakarta.annotation.Resource;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**

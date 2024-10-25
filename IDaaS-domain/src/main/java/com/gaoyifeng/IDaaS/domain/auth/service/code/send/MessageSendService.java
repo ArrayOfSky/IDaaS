@@ -1,4 +1,4 @@
-package com.gaoyifeng.IDaaS.domain.auth.service.code.message;
+package com.gaoyifeng.IDaaS.domain.auth.service.code.send;
 
 import com.gaoyifeng.IDaaS.domain.auth.service.code.ISendMessageService;
 import org.springframework.stereotype.Service;
