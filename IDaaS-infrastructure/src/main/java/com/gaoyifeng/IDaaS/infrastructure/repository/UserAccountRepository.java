@@ -37,11 +37,16 @@ public class UserAccountRepository implements IUserAccountRepository {
     private final String CACHE_BOUND_EMAIL = "bound:email:";
     private final String CACHE_BOUND_PHONE = "bound:phone:";
 
+    private final String CACHE_LOGIN_EMAIL = "login:email:";
+    private final String CACHE_LOGIN_PHONE = "login:phone:";
+
     private Map<CodeTypeVo,String> cacheMap = new HashMap<>(2);
 
     public UserAccountRepository(){
         cacheMap.put(CodeTypeVo.BOUND_EMAIL,CACHE_BOUND_EMAIL);
         cacheMap.put(CodeTypeVo.BOUND_PHONE,CACHE_BOUND_PHONE);
+        cacheMap.put(CodeTypeVo.LOGIN_EMAIL,CACHE_LOGIN_EMAIL);
+        cacheMap.put(CodeTypeVo.LOGIN_PHONE,CACHE_LOGIN_PHONE);
     }
 
 
@@ -65,6 +70,7 @@ public class UserAccountRepository implements IUserAccountRepository {
         codeSendEntity.setType(type);
         rabbitTemplate.convertAndSend(RabbitMqModel.EMAIL_QUEUE,RabbitMqModel.EMAIL_KEY+"message", JSON.toJSONString(codeSendEntity));
     }
+
 
     @Override
     public void putCacheCode(String account, String type, String code) {
@@ -120,6 +126,7 @@ public class UserAccountRepository implements IUserAccountRepository {
     public void updateUserAccount(UserAccountEntity user) {
         String flakeSnowId = user.getFlakeSnowId();
         UserAccountPo userAccountDb = userAccountDao.selectUserByFlakeSnowId(flakeSnowId);
+
         if(userAccountDb==null){
             throw new BaseException(Constants.ResponseCode.ILLEGAL_PARAMETER,"User not exist");
         }
@@ -158,6 +165,7 @@ public class UserAccountRepository implements IUserAccountRepository {
         }
         return userAccount;
     }
+
 
 
 }

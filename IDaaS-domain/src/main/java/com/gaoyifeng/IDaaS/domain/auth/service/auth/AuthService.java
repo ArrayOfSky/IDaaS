@@ -51,6 +51,8 @@ public class AuthService implements IAuthService {
         log.info("获取账号信息");
         UserAccountEntity userAccount = userGetServiceMap.get(CodeTypeVo.valueOf(type)).getUserAccountByAccount(account);
 
+        userAccountRepository.deleteCacheCode(account, type);
+
         // 生产令牌
         log.info("生产令牌");
         String token = jwtUtils.encode(userAccount.getFlakeSnowId(), 24 * 60 * 60 * 1000, BeanUtil.beanToMap(userAccount));
@@ -61,6 +63,11 @@ public class AuthService implements IAuthService {
     @Override
     public Map verify(String token) {
         return jwtUtils.decode(token);
+    }
+
+    @Override
+    public Map renewval(String token, String refreshToken) {
+        return null;
     }
 
 }

@@ -4,14 +4,12 @@ package com.gaoyifeng.IDaaS.domain.auth.service.auth.jwt;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.JWTVerifier;
-import com.gaoyifeng.IDaaS.domain.auth.repository.IUserAccountRepository;
 import com.gaoyifeng.IDaaS.types.commom.Constants;
 import com.gaoyifeng.IDaaS.types.exception.BaseException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,12 +24,16 @@ import java.util.UUID;
 @Slf4j
 public class JwtUtils {
 
-    @Value("${jwt.secretKey}")
+    @Value("${jwt.secret.key}")
     private static String SECRET_KEY;
+    private String base64EncodedSecretKey;
+    private Algorithm algorithm;
 
-    private final String base64EncodedSecretKey = Base64.encodeBase64String(SECRET_KEY.getBytes());
-    private final Algorithm algorithm = Algorithm.HMAC256(Base64.decodeBase64(Base64.encodeBase64String(SECRET_KEY.getBytes())));
-
+    public void init() {
+        log.info("JwtUtils init");
+        base64EncodedSecretKey = Base64.encodeBase64String(SECRET_KEY.getBytes());
+        algorithm = Algorithm.HMAC256(Base64.decodeBase64(Base64.encodeBase64String(SECRET_KEY.getBytes())));
+    }
 
     /**
      * 这里就是产生jwt字符串的地方
