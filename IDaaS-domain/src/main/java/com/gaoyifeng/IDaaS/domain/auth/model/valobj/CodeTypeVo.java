@@ -13,7 +13,9 @@ public enum CodeTypeVo {
 
     BOUND_EMAIL("0","邮箱认证"),
     BOUND_PHONE("1","手机号认证"),
-    BOUND_WECHAT("2","微信公众号认证");
+    BOUND_WECHAT("2","微信公众号认证"),
+    LOGIN_EMAIL("3","邮箱登录"),
+    LOGIN_PHONE("4","手机号登录");
 
     private String code;
     private String desc;

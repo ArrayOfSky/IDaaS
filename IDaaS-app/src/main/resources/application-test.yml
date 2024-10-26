@@ -95,3 +95,6 @@ thread:
         keep-alive-time: 5000
         block-queue-size: 5000
         policy: CallerRunsPolicy
+
+jwt:
+  secretKey: xxxxxx

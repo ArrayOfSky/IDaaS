@@ -8,7 +8,8 @@ public class AuthEntity {
 
     private String account;
 
-
     private String password;
+
+    private String type;
 
 }
