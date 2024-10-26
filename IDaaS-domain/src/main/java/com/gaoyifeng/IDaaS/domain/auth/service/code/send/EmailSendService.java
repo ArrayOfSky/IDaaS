@@ -16,9 +16,14 @@ public class EmailSendService implements ISendMessageService {
 
     private final String title = "gaoyifeng博客-验证码";
 
+    private final String contentTemplate = """
+        您的验证码是: %s. 请在5分钟内使用。
+        """;
+
     @Override
     public void sendMessage(String to, String content) {
-        qqEmailUtil.sendStringEmail(to, title, content);
+        String formattedContent = String.format(contentTemplate, content);
+        qqEmailUtil.sendStringEmail(to, title, formattedContent);
     }
 
 

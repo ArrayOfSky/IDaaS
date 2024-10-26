@@ -13,6 +13,7 @@ import com.gaoyifeng.IDaaS.types.commom.Constants;
 import com.gaoyifeng.IDaaS.types.enums.RabbitMqModel;
 import com.gaoyifeng.IDaaS.types.exception.BaseException;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Repository
+@Slf4j
 public class UserAccountRepository implements IUserAccountRepository {
 
     @Resource
@@ -45,6 +47,18 @@ public class UserAccountRepository implements IUserAccountRepository {
 
     @Override
     public void getCode(String account, String type,String code) {
+        // 验证码未过期，返回未过期的验证码值
+        CodeTypeVo codeType = CodeTypeVo.getCodeType(type);
+        String key = cacheMap.get(codeType);
+        if(StringUtils.isEmpty(key)){
+            throw new BaseException(Constants.ResponseCode.ILLEGAL_PARAMETER,"Invalid type: " + type);
+        }
+        String value = redissonService.getValue(key + account);
+        if(!StringUtils.isEmpty(value)){
+            code = value;
+        }
+        //  异步发送
+        log.info("异步发送验证码");
         CodeSendEntity codeSendEntity = new CodeSendEntity();
         codeSendEntity.setAccount(account);
         codeSendEntity.setCode(code);
@@ -75,6 +89,21 @@ public class UserAccountRepository implements IUserAccountRepository {
     public void deleteCacheCode(String account, String type) {
         redissonService.remove(cacheMap.get(CodeTypeVo.getCodeType(type)) + account);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     @Override
     public void insertUserAccount(UserAccountEntity user) {
         UserAccountPo userAccount = new UserAccountPo();

@@ -10,4 +10,5 @@ public class PhoneBoundService implements IVerifyMessageService {
     public void verifyMessage(String flakeSnowId, String account) {
 
     }
+
 }
