@@ -9,4 +9,10 @@ public interface IUserAccountDao {
     UserAccountPo selectUserByEmail(@Param("account") String account);
 
     UserAccountPo selectUserByPhone(@Param("account") String account);
+
+    void insertUserAccount(@Param("userAccount") UserAccountPo userAccount);
+
+    void updateUserAccount(@Param("userAccount") UserAccountPo userAccount);
+
+    UserAccountPo selectUserByFlakeSnowId(@Param("flakeSnowId") String flakeSnowId);
 }

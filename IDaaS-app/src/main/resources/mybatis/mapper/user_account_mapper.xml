@@ -14,6 +14,17 @@
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
     </resultMap>
+    <insert id="insertUserAccount">
+        insert into user_account(flake_snow_id, wx_open_id, wx_user_name, nick_name, icon, phone, email,create_time, update_time)
+        values(#{userAccount.flakeSnowId}, #{userAccount.wxOpenId}, #{userAccount.wxUserName}, #{userAccount.nickName}, #{userAccount.icon}, #{userAccount.phone}, #{userAccount.email}, #{userAccount.createTime}, #{userAccount.updateTime})
+    </insert>
+
+
+    <update id="updateUserAccount">
+        update user_account
+        set wx_open_id = #{userAccount.wxOpenId}, wx_user_name = #{userAccount.wxUserName}, nick_name = #{userAccount.nickName}, icon = #{userAccount.icon}, phone = #{userAccount.phone}, email = #{userAccount.email}, update_time = #{userAccount.updateTime}
+        where id = #{userAccount.flakeSnowId
+    </update>
 
 
     <select id="selectUserByEmail" resultMap="UserAccount">
@@ -25,7 +36,9 @@
     <select id="selectUserByPhone" resultMap="UserAccount">
         SELECT * FROM user_account WHERE phone = #{account}
     </select>
-
+    <select id="selectUserByFlakeSnowId" resultMap="UserAccount">
+        SELECT * FROM user_account WHERE flake_snow_id = #{flakeSnowId}
+    </select>
 
 
 </mapper>

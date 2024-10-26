@@ -23,6 +23,11 @@ public class CodeController {
     @Resource
     private ICodeService codeService;
 
+    /**
+     * 获取验证码
+     * @param codeEntity
+     * @return
+     */
     @PostMapping("/getCode")
     public Response<String> getCode(@RequestBody CodeEntity codeEntity){
         try{
@@ -43,7 +48,6 @@ public class CodeController {
                     .data(e.getContent())
                     .build();
         }catch (Exception e){
-            e.printStackTrace();
             log.error("生成验证码失败",e);
             return Response.<String>builder()
                     .code(Constants.ResponseCode.UN_ERROR.getCode())
@@ -54,7 +58,9 @@ public class CodeController {
     }
 
     /**
-     * 仅用于绑定等途径
+     * 验证验证码，完成绑定邮箱、手机号操作
+     * @param validEntity
+     * @return
      */
     @PostMapping("/validCode")
     public Response<String> validCode(@RequestBody ValidEntity validEntity){
@@ -70,19 +76,18 @@ public class CodeController {
                     .data("")
                     .build();
         }catch (BaseException e){
-            log.error("验证验证码",e);
+            log.error("验证验证码失败",e);
             return Response.<String>builder()
                     .code(e.getCode())
                     .info(e.getMessage())
                     .data(e.getContent())
                     .build();
         }catch (Exception e){
-            e.printStackTrace();
-            log.error("验证验证码",e);
+            log.error("验证验证码失败",e);
             return Response.<String>builder()
                     .code(Constants.ResponseCode.UN_ERROR.getCode())
-                    .info("验证验证码")
-                    .data("验证验证码")
+                    .info("验证验证码失败")
+                    .data("验证验证码失败")
                     .build();
         }
     }

@@ -8,9 +8,15 @@ public interface IUserAccountRepository {
 
     void putCacheCode(String account, String type, String code);
 
+    void insertUserAccount(UserAccountEntity user);
+
+    void updateUserAccount(UserAccountEntity user);
+
     UserAccountEntity selectUserByEmail(String account);
 
     UserAccountEntity selectUserByPhone(String account);
 
     String getCacheCode(String account, String type);
+
+    void deleteCacheCode(String account, String type);
 }

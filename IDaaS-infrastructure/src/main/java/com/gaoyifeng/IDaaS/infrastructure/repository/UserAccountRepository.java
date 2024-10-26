@@ -61,6 +61,45 @@ public class UserAccountRepository implements IUserAccountRepository {
         }
         redissonService.setValue(key + account,code,5000000);
     }
+    @Override
+    public String getCacheCode(String account, String type) {
+        CodeTypeVo codeType = CodeTypeVo.getCodeType(type);
+        String key = cacheMap.get(codeType);
+        if(StringUtils.isEmpty(key)){
+            throw new BaseException(Constants.ResponseCode.ILLEGAL_PARAMETER,"Invalid type: " + type);
+        }
+        return redissonService.getValue(key + account);
+    }
+
+    @Override
+    public void deleteCacheCode(String account, String type) {
+        redissonService.remove(cacheMap.get(CodeTypeVo.getCodeType(type)) + account);
+    }
+    @Override
+    public void insertUserAccount(UserAccountEntity user) {
+        UserAccountPo userAccount = new UserAccountPo();
+        userAccount.setCreateTime(user.getCreateTime());
+        userAccount.setIcon(user.getIcon());
+        userAccount.setUpdateTime(user.getUpdateTime());
+        userAccount.setNickName(user.getNickName());
+        userAccount.setEmail(user.getEmail());
+        userAccount.setFlakeSnowId(user.getFlakeSnowId());
+        userAccountDao.insertUserAccount(userAccount);
+    }
+
+    @Override
+    public void updateUserAccount(UserAccountEntity user) {
+        String flakeSnowId = user.getFlakeSnowId();
+        UserAccountPo userAccountDb = userAccountDao.selectUserByFlakeSnowId(flakeSnowId);
+        if(userAccountDb==null){
+            throw new BaseException(Constants.ResponseCode.ILLEGAL_PARAMETER,"User not exist");
+        }
+
+        userAccountDb.setEmail(user.getEmail());
+        userAccountDb.setUpdateTime(user.getUpdateTime());
+        userAccountDb.setFlakeSnowId(user.getFlakeSnowId());
+        userAccountDao.updateUserAccount(userAccountDb);
+    }
 
     @Override
     public UserAccountEntity selectUserByEmail(String account) {
@@ -72,16 +111,6 @@ public class UserAccountRepository implements IUserAccountRepository {
     public UserAccountEntity selectUserByPhone(String account) {
         UserAccountPo userAccountPo = userAccountDao.selectUserByPhone(account);
         return  getUserAccountEntityByPo(userAccountPo);
-    }
-
-    @Override
-    public String getCacheCode(String account, String type) {
-        CodeTypeVo codeType = CodeTypeVo.getCodeType(type);
-        String key = cacheMap.get(codeType);
-        if(StringUtils.isEmpty(key)){
-            throw new BaseException(Constants.ResponseCode.ILLEGAL_PARAMETER,"Invalid type: " + type);
-        }
-        return redissonService.getValue(key + account);
     }
 
     private UserAccountEntity getUserAccountEntityByPo(UserAccountPo userAccountPo){

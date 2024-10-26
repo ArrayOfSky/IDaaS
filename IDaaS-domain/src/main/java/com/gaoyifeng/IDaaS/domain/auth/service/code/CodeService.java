@@ -87,5 +87,8 @@ public class CodeService implements ICodeService {
         //校验成功，执行绑定操作
         log.info("校验成功，执行绑定操作");
         codeVerifyMap.get(CodeTypeVo.getCodeType(type)).verifyMessage(flakeSnowId, account);
+        //绑定成功，删除缓存中的验证码
+        log.info("绑定成功，删除缓存中的验证码");
+        userAccountRepository.deleteCacheCode(account, type);
     }
 }
