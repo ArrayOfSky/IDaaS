@@ -8,5 +8,5 @@ public interface IAuthService {
 
     Map verify(String token);
 
-    Map renewval(String token);
+    Map renewval(String token, String refreshToken);
 }
