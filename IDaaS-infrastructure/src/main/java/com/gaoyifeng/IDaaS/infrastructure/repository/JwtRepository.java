@@ -3,7 +3,9 @@ package com.gaoyifeng.IDaaS.infrastructure.repository;
 import com.gaoyifeng.IDaaS.domain.auth.repository.IJwtRepository;
 import com.gaoyifeng.IDaaS.infrastructure.redis.IRedisService;
 import jakarta.annotation.Resource;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class JwtRepository implements IJwtRepository {
 
     @Resource

@@ -2,8 +2,7 @@ package com.gaoyifeng.IDaaS.filter;
 
 
 import com.gaoyifeng.IDaaS.types.utils.HttpThreadLocalUtil;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
+import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -15,13 +14,19 @@ import java.io.IOException;
 
 @Component
 @Slf4j
-public class HttpThreadLocalFilter  extends OncePerRequestFilter {
-
+public class HttpThreadLocalFilter  implements Filter {
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    public void init(FilterConfig filterConfig) throws ServletException {
+        Filter.super.init(filterConfig);
+    }
+
+    @Override
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         log.info("进入了HttpThreadLocalFilter");
         try {
+            HttpServletRequest request = (HttpServletRequest) servletRequest;
+            HttpServletResponse response = (HttpServletResponse) servletResponse;
             HttpThreadLocalUtil.setRequest(request);
             HttpThreadLocalUtil.setResponse(response);
             // 执行过滤器链
@@ -30,8 +35,10 @@ public class HttpThreadLocalFilter  extends OncePerRequestFilter {
             // 清理 ThreadLocal 变量，防止内存泄漏
             HttpThreadLocalUtil.clear();
         }
-
     }
 
-
+    @Override
+    public void destroy() {
+        Filter.super.destroy();
+    }
 }

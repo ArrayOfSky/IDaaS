@@ -39,7 +39,9 @@ public class CodeService implements ICodeService {
                        PhoneBoundService phoneBoundService) {
 
         codeSendMap.put(CodeTypeVo.BOUND_EMAIL, emailSendService);
+        codeSendMap.put(CodeTypeVo.LOGIN_EMAIL,emailSendService);
         codeSendMap.put(CodeTypeVo.BOUND_PHONE, messageSendService);
+        codeSendMap.put(CodeTypeVo.LOGIN_PHONE, messageSendService);
 
         codeFilterMap.put(CodeTypeVo.BOUND_EMAIL, emailFilterService);
         codeFilterMap.put(CodeTypeVo.BOUND_PHONE, phoneFilterService);

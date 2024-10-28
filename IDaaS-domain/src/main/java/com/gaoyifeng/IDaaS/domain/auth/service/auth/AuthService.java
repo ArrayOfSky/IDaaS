@@ -15,7 +15,6 @@ import com.gaoyifeng.IDaaS.domain.auth.service.auth.jwt.JwtUtils;
 import com.gaoyifeng.IDaaS.types.commom.Constants;
 import com.gaoyifeng.IDaaS.types.exception.BaseException;
 import com.gaoyifeng.IDaaS.types.utils.HttpThreadLocalUtil;
-import io.jsonwebtoken.Claims;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -50,15 +49,15 @@ public class AuthService implements IAuthService {
         // 验证账号密码是否正确
         log.info("验证账号密码是否正确");
         String cacheCode = userAccountRepository.getCacheCode(account, type);
-        if (!cacheCode.equals(password)) {
+        if (cacheCode==null||!cacheCode.equals(password)) {
             throw new BaseException(Constants.ResponseCode.ILLEGAL_PARAMETER, "验证码错误");
         }
 
         // 获取账号信息
         log.info("获取账号信息");
-        UserAccountEntity userAccount = userGetServiceMap.get(CodeTypeVo.valueOf(type)).getUserAccountByAccount(account);
+        UserAccountEntity userAccount = userGetServiceMap.get(CodeTypeVo.getCodeType(type)).getUserAccountByAccount(account);
 
-        userAccountRepository.deleteCacheCode(account, type);
+//        userAccountRepository.deleteCacheCode(account, type);
 
         // 生产令牌
         log.info("生产令牌");
@@ -70,7 +69,7 @@ public class AuthService implements IAuthService {
         //为空 则创建
         if(userFreshTokenEntity==null){
             String freshToken = "freshToken_test";
-            userFreshTokenRepository.save(freshToken,userFreshTokenEntity.getUserFlakeSnowId());
+            userFreshTokenRepository.save(freshToken,userAccount.getFlakeSnowId());
             HttpThreadLocalUtil.getResponse().addHeader("refreshToken", freshToken);
         }
     }

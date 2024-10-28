@@ -1,19 +1,14 @@
 package com.gaoyifeng.IDaaS.domain.auth.service.auth.jwt;
 
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.JWTVerifier;
+import cn.hutool.jwt.JWT;
+import cn.hutool.jwt.JWTPayload;
+import cn.hutool.jwt.JWTUtil;
 import com.gaoyifeng.IDaaS.domain.auth.repository.IJwtRepository;
 import com.gaoyifeng.IDaaS.types.commom.Constants;
 import com.gaoyifeng.IDaaS.types.exception.BaseException;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtBuilder;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -27,18 +22,11 @@ import java.util.UUID;
 public class JwtUtils {
 
     @Value("${jwt.secret.key}")
-    private static String SECRET_KEY;
-    private String base64EncodedSecretKey;
-    private Algorithm algorithm;
+    private String SECRET_KEY;
 
     @Resource
     private IJwtRepository jwtRepository;
 
-    public void init() {
-        log.info("JwtUtils init");
-        base64EncodedSecretKey = Base64.encodeBase64String(SECRET_KEY.getBytes());
-        algorithm = Algorithm.HMAC256(Base64.decodeBase64(Base64.encodeBase64String(SECRET_KEY.getBytes())));
-    }
 
     /**
      * 这里就是产生jwt字符串的地方
@@ -59,55 +47,37 @@ public class JwtUtils {
         if (claims == null) {
             claims = new HashMap<>();
         }
-        long nowMillis = System.currentTimeMillis();
 
-        JwtBuilder builder = Jwts.builder()
-                // 荷载部分
-                .setClaims(claims)
-                // 这个是JWT的唯一标识，一般设置成唯一的，这个方法可以生成唯一标识
-                .setId(UUID.randomUUID().toString())//2.
-                // 签发时间
-                .setIssuedAt(new Date(nowMillis))
-                // 签发人，也就是JWT是给谁的（逻辑上一般都是username或者userId）
-                .setSubject(issuer)
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY);//这个地方是生成jwt使用的算法和秘钥
-        if (ttlMillis >= 0) {
-            long expMillis = nowMillis + ttlMillis;
-            Date exp = new Date(expMillis);// 4. 过期时间，这个也是使用毫秒生成的，使用当前时间+前面传入的持续时间生成
-            builder.setExpiration(exp);
-        }
-        String compact = builder.compact();
+        String token = JWTUtil.createToken(claims, SECRET_KEY.getBytes());
+
         // 放入缓存
-        jwtRepository.put(issuer, compact);
-        return compact;
+        jwtRepository.put(issuer, token);
+        return token;
     }
 
     // 相当于encode的方向，传入jwtToken生成对应的username和password等字段。Claim就是一个map
     // 也就是拿到荷载部分所有的键值对
-    public Claims decode(String jwtToken) {
+    public Map<String,String> decode(String jwtToken) {
         // 得到 DefaultJwtParser
-        Claims body = Jwts.parser()
-                // 设置签名的秘钥
-                .setSigningKey(base64EncodedSecretKey)
-                // 设置需要解析的 jwt
-                .parseClaimsJws(jwtToken)
-                .getBody();
+        JWT jwt = JWTUtil.parseToken(jwtToken);
+        JWTPayload jwtPayload = jwt.getPayload();
 
-        String userFlakeSnowId = (String) body.get("userFlakeSnowId");
+        String userFlakeSnowId = jwtPayload.getClaim("userFlakeSnowId").toString();
+
         // 验证缓存
         String cacheJwt = jwtRepository.get(userFlakeSnowId);
         if (!cacheJwt.equals(jwtToken)) {
             throw new BaseException(Constants.ResponseCode.ILLEGAL_PARAMETER, "token非法");
         }
 
+        Map<String,String> body = new HashMap<>();
         return body;
     }
 
     // 判断jwtToken是否合法
     public boolean isVerify(String jwtToken) {
         try {
-            JWTVerifier verifier = JWT.require(algorithm).build();
-            verifier.verify(jwtToken);
+            JWTUtil.verify(jwtToken, SECRET_KEY.getBytes());
             // 校验不通过会抛出异常
             // 判断合法的标准：1. 头部和荷载部分没有篡改过。2. 没有过期
             return true;
