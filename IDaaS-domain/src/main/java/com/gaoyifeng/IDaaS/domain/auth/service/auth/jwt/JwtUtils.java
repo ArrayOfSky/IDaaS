@@ -4,12 +4,14 @@ package com.gaoyifeng.IDaaS.domain.auth.service.auth.jwt;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.JWTVerifier;
+import com.gaoyifeng.IDaaS.domain.auth.repository.IJwtRepository;
 import com.gaoyifeng.IDaaS.types.commom.Constants;
 import com.gaoyifeng.IDaaS.types.exception.BaseException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +30,9 @@ public class JwtUtils {
     private static String SECRET_KEY;
     private String base64EncodedSecretKey;
     private Algorithm algorithm;
+
+    @Resource
+    private IJwtRepository jwtRepository;
 
     public void init() {
         log.info("JwtUtils init");
@@ -73,7 +78,7 @@ public class JwtUtils {
         }
         String compact = builder.compact();
         // 放入缓存
-
+        jwtRepository.put(issuer,compact);
         return compact;
     }
 
@@ -89,8 +94,12 @@ public class JwtUtils {
                     .parseClaimsJws(jwtToken)
                     .getBody();
 
+            String userFlakeSnowId = (String) body.get("userFlakeSnowId");
             // 验证缓存
-
+            String cacheJwt = jwtRepository.get(userFlakeSnowId);
+            if(!cacheJwt.equals(jwtToken)){
+                throw new BaseException(Constants.ResponseCode.ILLEGAL_PARAMETER,"token非法");
+            }
 
             return body;
         }else{

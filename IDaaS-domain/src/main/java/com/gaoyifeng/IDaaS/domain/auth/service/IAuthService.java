@@ -4,9 +4,9 @@ import java.util.Map;
 
 public interface IAuthService {
 
-    String login(String account, String password,String type);
+    void login(String account, String password,String type);
 
-    Map verify(String token);
+    Map<String,String> verify(String token);
 
-    Map renewval(String token, String refreshToken);
+    void renewval(String token, String refreshToken);
 }

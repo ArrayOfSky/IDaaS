@@ -27,11 +27,11 @@ public class AuthController {
                                      @RequestHeader("refresh_token")String refreshToken){
 
         try{
-            Map map = authService.renewval(token,refreshToken);
+            authService.renewval(token,refreshToken);
             return Response.<String>builder()
                     .code(Constants.ResponseCode.SUCCESS.getCode())
                     .info(Constants.ResponseCode.SUCCESS.getInfo())
-                    .data(JSON.toJSONString(map))
+                    .data("")
                     .build();
         }catch (BaseException e){
             log.error("验证失败",e);
@@ -55,7 +55,7 @@ public class AuthController {
     @PostMapping("/verify")
     public Response<String> verify(@RequestHeader("token") String token){
         try{
-            Map map = authService.verify(token);
+            Map<String,String> map = authService.verify(token);
             return Response.<String>builder()
                     .code(Constants.ResponseCode.SUCCESS.getCode())
                     .info(Constants.ResponseCode.SUCCESS.getInfo())
@@ -79,17 +79,17 @@ public class AuthController {
     }
 
     @PostMapping("/authorize")
-    public Response<String> login(@RequestBody AuthEntity authEntity) {
+    public Response login(@RequestBody AuthEntity authEntity) {
         try{
             log.info("准备进行验证");
             String account = authEntity.getAccount();
             String password = authEntity.getPassword();
             String type = authEntity.getType();
-            String token = authService.login(account,password,type);
+            authService.login(account,password,type);
             return Response.<String>builder()
                     .code(Constants.ResponseCode.SUCCESS.getCode())
                     .info(Constants.ResponseCode.SUCCESS.getInfo())
-                    .data(token)
+                    .data("")
                     .build();
         }catch (BaseException e){
             log.error("验证失败",e);
