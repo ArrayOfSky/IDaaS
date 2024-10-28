@@ -66,7 +66,6 @@ public class AuthService implements IAuthService {
         HttpThreadLocalUtil.getResponse().addHeader("Authorization", token);
 
         //refreshtoken
-
         UserFreshTokenEntity userFreshTokenEntity = userFreshTokenRepository.get(userAccount.getFlakeSnowId());
         //为空 则创建
         if(userFreshTokenEntity==null){
@@ -78,13 +77,29 @@ public class AuthService implements IAuthService {
 
     @Override
     public Map verify(String token) {
-        return jwtUtils.decode(token);
+        if(jwtUtils.isVerify(token)){
+            return jwtUtils.decode(token);
+        }
+        throw new BaseException(Constants.ResponseCode.ILLEGAL_PARAMETER, "token非法");
     }
 
     @Override
     public void renewval(String token, String refreshToken) {
-
-
+         //判断refreshToken是否正确
+        UserFreshTokenEntity userFreshTokenEntity = userFreshTokenRepository.get(jwtUtils.decode(token).get("flakeSnowId").toString());
+        if(userFreshTokenEntity!=null){
+            if(refreshToken.equals(userFreshTokenEntity.getFreshToken())){
+                //生产新的token
+                // 生产令牌
+                log.info("生产令牌");
+                String userFlakeSnowId = userFreshTokenEntity.getUserFlakeSnowId();
+                UserAccountEntity userAccount = userAccountRepository.selectUserByFlakeSnowId(userFlakeSnowId);
+                token = jwtUtils.encode(userFlakeSnowId, 24 * 60 * 60 * 1000, BeanUtil.beanToMap(userAccount));
+                HttpThreadLocalUtil.getResponse().addHeader("Authorization", token);
+                return;
+            }
+        }
+        throw new BaseException(Constants.ResponseCode.ILLEGAL_PARAMETER, "refreshToken非法");
     }
 
 }

@@ -149,6 +149,12 @@ public class UserAccountRepository implements IUserAccountRepository {
         return  getUserAccountEntityByPo(userAccountPo);
     }
 
+    @Override
+    public UserAccountEntity selectUserByFlakeSnowId(String flakeSnowId) {
+        UserAccountPo userAccountPo = userAccountDao.selectUserByFlakeSnowId(flakeSnowId);
+        return  getUserAccountEntityByPo(userAccountPo);
+    }
+
     private UserAccountEntity getUserAccountEntityByPo(UserAccountPo userAccountPo){
         UserAccountEntity userAccount = null;
         if(userAccountPo!=null){

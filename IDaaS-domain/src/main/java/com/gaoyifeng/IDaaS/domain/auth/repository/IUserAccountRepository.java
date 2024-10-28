@@ -16,6 +16,8 @@ public interface IUserAccountRepository {
 
     UserAccountEntity selectUserByPhone(String account);
 
+    UserAccountEntity selectUserByFlakeSnowId(String flakeSnowId);
+
     String getCacheCode(String account, String type);
 
     void deleteCacheCode(String account, String type);

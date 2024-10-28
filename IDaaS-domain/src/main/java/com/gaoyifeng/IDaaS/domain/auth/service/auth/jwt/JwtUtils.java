@@ -78,37 +78,33 @@ public class JwtUtils {
         }
         String compact = builder.compact();
         // 放入缓存
-        jwtRepository.put(issuer,compact);
+        jwtRepository.put(issuer, compact);
         return compact;
     }
 
     // 相当于encode的方向，传入jwtToken生成对应的username和password等字段。Claim就是一个map
     // 也就是拿到荷载部分所有的键值对
     public Claims decode(String jwtToken) {
-        if(isVerify(jwtToken)){
-            // 得到 DefaultJwtParser
-            Claims body = Jwts.parser()
-                    // 设置签名的秘钥
-                    .setSigningKey(base64EncodedSecretKey)
-                    // 设置需要解析的 jwt
-                    .parseClaimsJws(jwtToken)
-                    .getBody();
+        // 得到 DefaultJwtParser
+        Claims body = Jwts.parser()
+                // 设置签名的秘钥
+                .setSigningKey(base64EncodedSecretKey)
+                // 设置需要解析的 jwt
+                .parseClaimsJws(jwtToken)
+                .getBody();
 
-            String userFlakeSnowId = (String) body.get("userFlakeSnowId");
-            // 验证缓存
-            String cacheJwt = jwtRepository.get(userFlakeSnowId);
-            if(!cacheJwt.equals(jwtToken)){
-                throw new BaseException(Constants.ResponseCode.ILLEGAL_PARAMETER,"token非法");
-            }
-
-            return body;
-        }else{
-            throw new BaseException(Constants.ResponseCode.ILLEGAL_PARAMETER,"token非法");
+        String userFlakeSnowId = (String) body.get("userFlakeSnowId");
+        // 验证缓存
+        String cacheJwt = jwtRepository.get(userFlakeSnowId);
+        if (!cacheJwt.equals(jwtToken)) {
+            throw new BaseException(Constants.ResponseCode.ILLEGAL_PARAMETER, "token非法");
         }
+
+        return body;
     }
 
     // 判断jwtToken是否合法
-    private boolean isVerify(String jwtToken) {
+    public boolean isVerify(String jwtToken) {
         try {
             JWTVerifier verifier = JWT.require(algorithm).build();
             verifier.verify(jwtToken);
@@ -121,8 +117,6 @@ public class JwtUtils {
         }
 
     }
-
-
 
 
 }
