@@ -1,7 +1,6 @@
 package com.gaoyifeng.IDaaS.infrastructure.repository;
 
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.nacos.shaded.com.google.gson.JsonObject;
 import com.gaoyifeng.IDaaS.domain.auth.model.entity.CodeSendEntity;
 import com.gaoyifeng.IDaaS.domain.auth.model.entity.UserAccountEntity;
 import com.gaoyifeng.IDaaS.domain.auth.model.valobj.CodeTypeVo;
@@ -31,6 +30,7 @@ public class UserAccountRepository implements IUserAccountRepository {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
     @Resource
     private IRedisService redissonService;
 
@@ -52,7 +52,6 @@ public class UserAccountRepository implements IUserAccountRepository {
 
     @Override
     public void getCode(String account, String type,String code) {
-        // 验证码未过期，返回未过期的验证码值
         CodeTypeVo codeType = CodeTypeVo.getCodeType(type);
         String key = cacheMap.get(codeType);
         if(StringUtils.isEmpty(key)){
@@ -60,7 +59,9 @@ public class UserAccountRepository implements IUserAccountRepository {
         }
         String value = redissonService.getValue(key + account);
         if(!StringUtils.isEmpty(value)){
+            log.info("存在未过期验证码，刷新存活时间");
             code = value;
+            redissonService.setValue(key + account,code,5000000);
         }
         //  异步发送
         log.info("异步发送验证码");
@@ -70,6 +71,7 @@ public class UserAccountRepository implements IUserAccountRepository {
         codeSendEntity.setType(type);
         rabbitTemplate.convertAndSend(RabbitMqModel.EMAIL_QUEUE,RabbitMqModel.EMAIL_KEY+"message", JSON.toJSONString(codeSendEntity));
     }
+
 
 
     @Override
@@ -95,13 +97,6 @@ public class UserAccountRepository implements IUserAccountRepository {
     public void deleteCacheCode(String account, String type) {
         redissonService.remove(cacheMap.get(CodeTypeVo.getCodeType(type)) + account);
     }
-
-
-
-
-
-
-
 
 
 
@@ -171,6 +166,9 @@ public class UserAccountRepository implements IUserAccountRepository {
         }
         return userAccount;
     }
+
+
+
 
 
 

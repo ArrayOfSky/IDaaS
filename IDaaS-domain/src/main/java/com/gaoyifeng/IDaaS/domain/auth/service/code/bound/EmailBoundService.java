@@ -32,7 +32,7 @@ public class EmailBoundService implements IVerifyMessageService {
         userAccount.setEmail(account);
         if(StringUtils.isEmpty(flakeSnowId)){
             //注册
-            log.info("用户注册");
+            log.info("新用户注册");
             userAccountRepository.insertUserAccount(userAccount);
         }else{
             //绑定

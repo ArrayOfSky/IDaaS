@@ -1,10 +1,14 @@
 package com.gaoyifeng.IDaaS.domain.auth.model.valobj;
 
+import cn.hutool.json.JSONUtil;
 import com.gaoyifeng.IDaaS.types.commom.Constants;
 import com.gaoyifeng.IDaaS.types.exception.BaseException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Getter
 @NoArgsConstructor
@@ -30,5 +34,12 @@ public enum CodeTypeVo {
          throw new BaseException(Constants.ResponseCode.ILLEGAL_PARAMETER,"Invalid type: " + type);
     }
 
+    public static Map<String, String> toJson() {
+        Map<String, String> jsonMap = new HashMap<>();
+        for (CodeTypeVo codeType : CodeTypeVo.values()) {
+            jsonMap.put(codeType.getDesc(), codeType.getCode());
+        }
+        return jsonMap;
+    }
 
 }

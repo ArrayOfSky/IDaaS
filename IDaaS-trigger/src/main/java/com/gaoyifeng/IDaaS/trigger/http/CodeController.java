@@ -1,8 +1,8 @@
 package com.gaoyifeng.IDaaS.trigger.http;
 
 
+import com.gaoyifeng.IDaaS.domain.auth.model.valobj.CodeTypeVo;
 import com.gaoyifeng.IDaaS.domain.auth.service.ICodeService;
-import com.gaoyifeng.IDaaS.domain.auth.service.code.CodeService;
 import com.gaoyifeng.IDaaS.trigger.http.dto.CodeEntity;
 import com.gaoyifeng.IDaaS.trigger.http.dto.ValidEntity;
 import com.gaoyifeng.IDaaS.types.commom.Constants;
@@ -15,6 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
+/**
+ * 验证码
+ * @author gaoyifeng
+ */
 @RestController
 @RequestMapping("/code")
 @Slf4j
@@ -24,9 +30,20 @@ public class CodeController {
     private ICodeService codeService;
 
     /**
+     * 获取验证码类型字典
+     */
+    @PostMapping("/getCodeType")
+    public Response<Map<String,String>> getCodeType(){
+        return Response.<Map<String,String>>builder()
+                .code(Constants.ResponseCode.SUCCESS.getCode())
+                .info(Constants.ResponseCode.SUCCESS.getInfo())
+                .data(CodeTypeVo.toJson())
+                .build();
+    }
+
+
+    /**
      * 获取验证码
-     * @param codeEntity
-     * @return
      */
     @PostMapping("/getCode")
     public Response<String> getCode(@RequestBody CodeEntity codeEntity){
@@ -59,8 +76,6 @@ public class CodeController {
 
     /**
      * 验证验证码，完成绑定邮箱、手机号操作
-     * @param validEntity
-     * @return
      */
     @PostMapping("/validCode")
     public Response<String> validCode(@RequestBody ValidEntity validEntity){
