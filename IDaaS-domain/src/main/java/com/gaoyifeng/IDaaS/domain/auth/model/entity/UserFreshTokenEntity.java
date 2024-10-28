@@ -19,4 +19,6 @@ public class UserFreshTokenEntity {
 
     private Date createTime;
 
+    private String token;
+
 }

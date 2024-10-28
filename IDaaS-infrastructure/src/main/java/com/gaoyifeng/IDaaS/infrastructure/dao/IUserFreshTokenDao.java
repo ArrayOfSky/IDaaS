@@ -12,6 +12,6 @@ public interface IUserFreshTokenDao {
     void save(@Param("userFreshTokenPo") UserFreshTokenPo userFreshTokenPo);
 
     UserFreshTokenPo get(@Param("userFlakeSnowId") String userFlakeSnowId);
-
+    UserFreshTokenPo getByToken( @Param("refreshToken") String refreshToken);
 
 }

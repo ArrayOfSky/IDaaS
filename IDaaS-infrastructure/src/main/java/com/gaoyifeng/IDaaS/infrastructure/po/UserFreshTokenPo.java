@@ -14,4 +14,6 @@ public class UserFreshTokenPo {
 
     private Date createTime;
 
+    private String token;
+
 }

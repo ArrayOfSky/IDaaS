@@ -1,8 +1,6 @@
 package com.gaoyifeng.IDaaS.domain.auth.service.auth;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.bean.copier.BeanToMapCopier;
-import cn.hutool.jwt.JWT;
 import com.gaoyifeng.IDaaS.domain.auth.model.entity.UserAccountEntity;
 import com.gaoyifeng.IDaaS.domain.auth.model.entity.UserFreshTokenEntity;
 import com.gaoyifeng.IDaaS.domain.auth.model.valobj.CodeTypeVo;
@@ -17,6 +15,7 @@ import com.gaoyifeng.IDaaS.types.exception.BaseException;
 import com.gaoyifeng.IDaaS.types.utils.HttpThreadLocalUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -57,25 +56,22 @@ public class AuthService implements IAuthService {
         log.info("获取账号信息");
         UserAccountEntity userAccount = userGetServiceMap.get(CodeTypeVo.getCodeType(type)).getUserAccountByAccount(account);
 
-//        userAccountRepository.deleteCacheCode(account, type);
+        userAccountRepository.deleteCacheCode(account, type);
 
         // 生产令牌
         log.info("生产令牌");
-        String token = jwtUtils.encode(userAccount.getFlakeSnowId(), 24 * 60 * 60 * 1000, BeanUtil.beanToMap(userAccount));
+        String token = jwtUtils.encode(userAccount.getFlakeSnowId(), BeanUtil.beanToMap(userAccount));
         HttpThreadLocalUtil.getResponse().addHeader("Authorization", token);
 
-        //refreshtoken
-        UserFreshTokenEntity userFreshTokenEntity = userFreshTokenRepository.get(userAccount.getFlakeSnowId());
-        //为空 则创建
-        if(userFreshTokenEntity==null){
-            String freshToken = "freshToken_test";
-            userFreshTokenRepository.save(freshToken,userAccount.getFlakeSnowId());
-            HttpThreadLocalUtil.getResponse().addHeader("refreshToken", freshToken);
-        }
+        // 生成refresh-token
+        userFreshTokenRepository.remove(userAccount.getFlakeSnowId());
+        String freshToken = RandomStringUtils.randomNumeric(16) + "idaas";
+        userFreshTokenRepository.save(freshToken,userAccount.getFlakeSnowId(),token);
+        HttpThreadLocalUtil.getResponse().addHeader("refresh-token", freshToken);
     }
 
     @Override
-    public Map verify(String token) {
+    public Map<String,String> verify(String token) {
         if(jwtUtils.isVerify(token)){
             return jwtUtils.decode(token);
         }
@@ -84,21 +80,23 @@ public class AuthService implements IAuthService {
 
     @Override
     public void renewval(String token, String refreshToken) {
-         //判断refreshToken是否正确
-        UserFreshTokenEntity userFreshTokenEntity = userFreshTokenRepository.get(jwtUtils.decode(token).get("flakeSnowId").toString());
-        if(userFreshTokenEntity!=null){
-            if(refreshToken.equals(userFreshTokenEntity.getFreshToken())){
-                //生产新的token
-                // 生产令牌
-                log.info("生产令牌");
-                String userFlakeSnowId = userFreshTokenEntity.getUserFlakeSnowId();
-                UserAccountEntity userAccount = userAccountRepository.selectUserByFlakeSnowId(userFlakeSnowId);
-                token = jwtUtils.encode(userFlakeSnowId, 24 * 60 * 60 * 1000, BeanUtil.beanToMap(userAccount));
-                HttpThreadLocalUtil.getResponse().addHeader("Authorization", token);
-                return;
-            }
+        UserFreshTokenEntity userFreshTokenEntity = userFreshTokenRepository.getByToken(refreshToken);
+        if(userFreshTokenEntity!=null&&userFreshTokenEntity.getToken().equals(token)){
+            String flakeSnowId = userFreshTokenEntity.getUserFlakeSnowId();
+            UserAccountEntity userAccount = userAccountRepository.selectUserByFlakeSnowId(flakeSnowId);
+            // 生产令牌
+            log.info("生产令牌");
+            String jwt = jwtUtils.encode(flakeSnowId,  BeanUtil.beanToMap(userAccount));
+            HttpThreadLocalUtil.getResponse().addHeader("Authorization", jwt);
+
+            // 生成refresh-token
+            userFreshTokenRepository.remove(flakeSnowId);
+            String freshToken = RandomStringUtils.randomNumeric(16);
+            userFreshTokenRepository.save(freshToken,userAccount.getFlakeSnowId(),jwt);
+            HttpThreadLocalUtil.getResponse().addHeader("refresh-token", freshToken);
+        }else{
+            throw new BaseException(Constants.ResponseCode.ILLEGAL_PARAMETER, "refreshToken非法");
         }
-        throw new BaseException(Constants.ResponseCode.ILLEGAL_PARAMETER, "refreshToken非法");
     }
 
 }
