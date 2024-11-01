@@ -4,8 +4,7 @@
 
 服务功能：集成多种用户登陆方式、授权、认证方式，用户管理接口。
 
-架构：DDD模式
-
+架构：DDD模式、SpringCloud Alibaba、Jenkins、Redis、MySQL、ES
 
 # v1版本完成-2024-10-28
 
